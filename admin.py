@@ -7,6 +7,7 @@ from os import path
 from google.appengine.ext import ndb
 from time import sleep
 from xml.dom.minidom import parse
+# "The existance of XML strongly implies there is no God"
 
 env = jinja2.Environment(
     loader=jinja2.FileSystemLoader(path.dirname(__file__)),
@@ -27,12 +28,15 @@ class Admin(webapp2.RequestHandler):
     def post(self):
         entry = q.Game(parent=q.db_key())
         entry.name = self.request.get('name')
+        # You may want to consider some kind of validation handling here.
+        # If you get an unexpected value the app will simply break instead of
+        # handling it gracefully.
         entry.minplayers = int(self.request.get('minplayers'))
         entry.maxplayers = int(self.request.get('maxplayers'))
         entry.mintime = int(self.request.get('mintime'))
         entry.maxtime = int(self.request.get('maxtime'))
         entry.rating = float(self.request.get('rating'))
-        entry.put()
+        entry.put() # This seems pretty open to XSS unless I'm missing something.
         self.redirect('/admin')
 
 # Handler for modifying game entries
@@ -77,8 +81,8 @@ class ImportDB(webapp2.RequestHandler):
         BGGUserName = self.request.get('BGGUserName')
         url = 'http://www.boardgamegeek.com/xmlapi/collection/' + BGGUserName + '?own=1'
         prep = urlopen(url)
-        prep.close()
-        sleep(10)
+        prep.close()  
+        sleep(10) # What exactly is happening here? Does the API take 10 seconds to respond?
         dom = parse(urlopen(url))
         for item in dom.getElementsByTagName("item"):
             entry = q.Game(parent=q.db_key())
