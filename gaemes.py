@@ -19,7 +19,7 @@ class MainPage(webapp2.RequestHandler):
         self.response.write(index_template.render(games=games))
 
 # Display page with results filtered by user input
-class Query(webapp2.RequestHandler):
+class Query(webapp2.RequestHandler): # Nit: you may want to pick a more specific name.
     def get(self):
         try:
             playercount = int(self.request.get("playerlimit"))
@@ -33,7 +33,7 @@ class Query(webapp2.RequestHandler):
         games = q.game_query.fetch()
         filterlist = []
             
-        for item in games:
+        for item in games: # You can use the ndb filter() method to do this in the query.
             if (playercount == 0):
                 if (item.maxtime <= timelimit):
                     filterlist.append(item)
